@@ -1,0 +1,54 @@
+version: "3.9"
+
+services:
+  algorithmix-db:
+    container_name: algorithmix-db
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    restart: on-failure
+    ports:
+      - "${DB_PORT}:1433"
+    networks:
+      - algorithmix-network
+    volumes:
+      - algorithmix-db-volume:/var/opt/mssql
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_PID=Express
+      - SA_PASSWORD=${DB_PASS}
+
+  algorithmix-server:
+    container_name: algorithmix-server
+    image: algorithmixkb/algorithmix-server:latest
+    restart: on-failure
+    environment:
+      - ConnectionStrings__Algorithmix=Server=${DB_HOST},${DB_PORT};Initial Catalog=${DB_NAME};User ID=${DB_USER};Password=${DB_PASS}
+      - Mail__Host=${MAIL_HOST}
+      - Mail__Port=${MAIL_PORT}
+      - Mail__Credentials__Login=${MAIL_CREDENTIALS_LOGIN}
+      - Mail__Credentials__Password=${MAIL_CREDENTIALS_PASSWORD}
+      - Client__Url=${CLIENT_URL}
+    networks:
+      - algorithmix-network
+    ports:
+      - "${SERVER_PORT}:80"
+    depends_on:
+      - algorithmix-db
+
+  algorithmix-client:
+    container_name: algorithmix-client
+    image: algorithmixkb/algorithmix-client:latest
+    environment:
+        - SERVER_URL=${SERVER_URL}
+    restart: on-failure
+    networks:
+      - algorithmix-network
+    ports:
+      - "${CLIENT_PORT}:80"
+    depends_on:
+      - algorithmix-server
+
+networks:
+  algorithmix-network:
+
+volumes:
+  algorithmix-db-volume:
