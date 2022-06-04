@@ -18,7 +18,7 @@ services:
 
   algorithmix-server:
     container_name: algorithmix-server
-    image: algorithmixkb/algorithmix-server:latest
+    image: algorithmixkb/algorithmix-server:2022.1
     restart: on-failure
     environment:
       - ConnectionStrings__Algorithmix=Server=${DB_HOST},${DB_PORT};Initial Catalog=${DB_NAME};User ID=${DB_USER};Password=${DB_PASS}
@@ -36,7 +36,7 @@ services:
 
   algorithmix-client:
     container_name: algorithmix-client
-    image: algorithmixkb/algorithmix-client:latest
+    image: algorithmixkb/algorithmix-client:2022.1
     environment:
         - SERVER_URL=${SERVER_URL}
     restart: on-failure
